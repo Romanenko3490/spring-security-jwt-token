@@ -1,0 +1,2 @@
+databaseChangeLog:
+  - 001-initial-schema.sql
