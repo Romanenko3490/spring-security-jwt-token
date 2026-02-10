@@ -27,6 +27,10 @@ public class CommonJwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
+        System.out.println("=== GATEWAY FILTER START ===");
+        System.out.println("URI: " + request.getRequestURI());
+        System.out.println("Authorization: " + request.getHeader("Authorization"));
+
 
         //основная логика фильтра, выполняется только для защищенных путей
 
@@ -57,9 +61,17 @@ public class CommonJwtAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
         } catch (Exception e) {
+            SecurityContextHolder.clearContext();
             sendError(response, 401, "Token process error: " + e.getMessage());
             return;
-        }
+        } // finally {
+//            SecurityContextHolder.clearContext();
+//        }
+
+
+        System.out.println("Authentication set: " +
+                SecurityContextHolder.getContext().getAuthentication());
+        System.out.println("=== GATEWAY FILTER END ===");
 
         filterChain.doFilter(request, response);
     }
@@ -79,7 +91,8 @@ public class CommonJwtAuthenticationFilter extends OncePerRequestFilter {
 
         return requestURI.contains("/auth/register") ||
                 requestURI.contains("/auth/login") ||
-                requestURI.contains("/actuator/");
+                requestURI.contains("/actuator/") ||
+                requestURI.contains("/test-config");
 
     }
 

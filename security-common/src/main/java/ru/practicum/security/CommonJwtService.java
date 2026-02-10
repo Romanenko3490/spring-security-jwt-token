@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import ru.practicum.user.Roles;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -22,7 +23,6 @@ public class CommonJwtService {
                 .setSigningKey(secretKey)
                 .setAllowedClockSkewSeconds(60)
                 .requireIssuer("auth-service")
-                .requireAudience("gateway")
                 .setClock(() -> new Date())
                 .build();
     }

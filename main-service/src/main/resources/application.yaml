@@ -1,6 +1,12 @@
 server:
   port: 8081
 
+auth-service:
+  url: http://auth-service:8082
+
+getaway:
+  url: http://gateway:8080
+
 spring:
   application:
     name: main-service
@@ -26,3 +32,7 @@ spring:
     password: "12345"
     url: "jdbc:postgresql://main-service-db:5432/maindb"
     driver-class-name: org.postgresql.Driver
+
+jwt:
+  secret: "MySuperSecretKeyChangeInProduction12345WhichIsNotLessThen256BitOr64Simvols"
+  expiration: 86400000

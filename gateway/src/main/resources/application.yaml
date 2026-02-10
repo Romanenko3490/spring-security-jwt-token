@@ -2,10 +2,10 @@ server:
   port: 8080
 
 main-service:
-  url: "http://main-service:8081"
+  url: http://main-service:8081
 
 auth-service:
-  url: "http://auth-service:8082"
+  url: http://auth-service:8082
 
 spring:
   application:

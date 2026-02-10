@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import ru.practicum.clients.AuthWebClient;
+import ru.practicum.clients.UserClient;
 
 @RestController
 @RequestMapping("/auth")
@@ -18,11 +19,17 @@ import ru.practicum.clients.AuthWebClient;
 @Validated
 public class UserController {
 
-    final AuthWebClient authWebClient;
+    private final AuthWebClient authWebClient;
+    private final UserClient userClient;
 
-    @PostMapping("/register")
-    public Mono<ResponseMsg> register(@RequestBody @Valid RegisterRequest request) {
-        return authWebClient.register(request);
+    @PostMapping("/register/user")
+    public Mono<ResponseMsg> registerUser(@RequestBody @Valid RegisterRequest request) {
+        return authWebClient.registerUser(request);
+    }
+
+    @PostMapping("/register/admin")
+    public Mono<ResponseMsg> registerAdmin(@RequestBody @Valid RegisterRequest request) {
+        return authWebClient.registerAdmin(request);
     }
 
 
@@ -36,16 +43,4 @@ public class UserController {
         return authWebClient.validateToken(authHeader);
     }
 
-
-    //tests requests
-    @GetMapping("/welcome")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseMsg welcomeUser(Authentication authentication) {
-        log.info("get request to /welcome");
-        String username = authentication.getName();
-
-        return ResponseMsg.builder()
-                .message("Welcome user " + username + " auth: " + authentication)
-                .build();
-    }
 }

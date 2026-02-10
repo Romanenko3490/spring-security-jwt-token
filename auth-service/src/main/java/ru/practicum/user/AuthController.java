@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.security.CommonJwtService;
-import ru.practicum.security.JwtService;
+import ru.practicum.security.JwtServiceAuth;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,13 +16,13 @@ import java.util.Map;
 public class AuthController {
 
     private final UserService userService;
-    private final JwtService jwtService;
+    private final JwtServiceAuth jwtServiceAuth;
     private final PasswordEncoder passwordEncoder;
 
 
-    //Регистрация
-    @PostMapping("/register")
-    public ResponseMsg register(@RequestBody RegisterRequest request) {
+    //Регистрация юзер
+    @PostMapping("/register/user")
+    public ResponseMsg registerUser(@RequestBody RegisterRequest request) {
         if (userService.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
@@ -41,6 +40,29 @@ public class AuthController {
                 .message("User successfully registered with id: " + user.getId())
                 .build();
     }
+
+    //Регистрация админ
+    @PostMapping("/register/admin")
+    public ResponseMsg registerAdmin(@RequestBody RegisterRequest request) {
+        if (userService.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = User.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword())) //важно
+                .role(Roles.ADMIN)
+                .build();
+
+        userService.save(user);
+
+        return ResponseMsg.builder()
+                .message("User successfully registered with id: " + user.getId())
+                .build();
+    }
+
+
 
     //логин
     @PostMapping("/login")
@@ -68,7 +90,7 @@ public class AuthController {
             log.info("Authentication successful!");
 
             //генерируем токен
-            String token = jwtService.generateToken(
+            String token = jwtServiceAuth.generateToken(
                     user.getUsername(),
                     user.getEmail(),
                     user.getRole()
@@ -118,7 +140,7 @@ public class AuthController {
         }
 
         String token = authHeader.substring(7);
-        boolean isValid = jwtService.validateToken(token);
+        boolean isValid = jwtServiceAuth.validateToken(token);
 
         if (!isValid) {
             return ResponseMsg.builder()
@@ -126,8 +148,8 @@ public class AuthController {
                     .build();
         }
 
-        String username = jwtService.extractUsername(token);
-        String role = jwtService.extractRole(token);
+        String username = jwtServiceAuth.extractUsername(token);
+        String role = jwtServiceAuth.extractRole(token);
 
         Map<String, Object> response = new HashMap<>();
         response.put("valid", true);

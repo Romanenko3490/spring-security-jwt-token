@@ -21,10 +21,24 @@ public class AuthWebClient extends BaseWebClient {
         super(baseUrl, API_PREFIX);
     }
 
-    public Mono<ResponseMsg> register(@RequestBody RegisterRequest request) {
+    public Mono<ResponseMsg> registerUser(@RequestBody RegisterRequest request) {
         log.info("Register request {}", request);
         return webClient.post()
-                .uri("/register")
+                .uri("/register/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(ResponseMsg.class)
+                .doOnSuccess(response -> {
+                    log.info("registered Successfully");
+                })
+                .doOnError(error -> log.error("Register failed"));
+    }
+
+    public Mono<ResponseMsg> registerAdmin(@RequestBody RegisterRequest request) {
+        log.info("Register request {}", request);
+        return webClient.post()
+                .uri("/register/admin")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .retrieve()

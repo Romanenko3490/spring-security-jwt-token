@@ -10,9 +10,6 @@ services:
         condition: service_healthy
       auth-service:
         condition: service_healthy
-    environment:
-      - MAIN_SERVICE_URL=//main-service:8081
-
 
   main-service:
     build:
